@@ -71,6 +71,8 @@ dependencies {
     kapt ("com.squareup.moshi:moshi-kotlin-codegen:1.15.2")
 
 
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
     implementation(libs.hilt.android)
     implementation ("androidx.hilt:hilt-navigation-compose:1.0.0")
 
