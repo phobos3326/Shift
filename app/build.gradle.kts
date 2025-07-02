@@ -68,7 +68,8 @@ dependencies {
 
     implementation (libs.moshi.kotlin)
     implementation (libs.converter.moshi)
-    kapt ("com.squareup.moshi:moshi-kotlin-codegen:1.15.2")
+    ksp (libs.moshi.kotlin.codegen)
+
 
 
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")

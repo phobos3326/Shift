@@ -106,16 +106,16 @@ fun UserListScreen(navController: NavController, viewModel: UserViewModel = hilt
         LazyColumn(modifier = Modifier.padding(it)) {
             items(users) { user ->
                 ListItem(
-                   /* headlineContent = { Text(user.fullName) },
-                    supportingContent = { Text(user.address) },*/
-                    headlineContent = { Text("user.fullName") },
-                    supportingContent = { Text("user.address") },
+                    headlineContent = { Text(user.fullName) },
+                    supportingContent = { Text(user.address) },
+                   /* headlineContent = { Text("user.fullName") },
+                    supportingContent = { Text("user.address") },*/
                     leadingContent = {
-                        /*Image(
+                        Image(
                             painter = rememberAsyncImagePainter(user.thumbnail),
                             contentDescription = null,
                             modifier = Modifier.size(48.dp)
-                        )*/
+                        )
                     },
                     modifier = Modifier.clickable {
                         navController.navigate("detail/${user.id}")
