@@ -24,6 +24,10 @@ interface UserDao {
 
     @Query("DELETE FROM users")
     suspend fun clearAll()
+
+    @Query("SELECT * FROM users WHERE id = :userId LIMIT 1")
+    fun getUserById(userId: String): Flow<UserEntity?>
+
 }
 
 @Database(entities = [UserEntity::class, RemoteKeys::class], version = 2, exportSchema = false)

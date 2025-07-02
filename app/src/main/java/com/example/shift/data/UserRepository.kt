@@ -11,6 +11,7 @@ class UserRepository @Inject constructor(
     private val api: UserApi,
     private val db: AppDatabase
 ) {
+    private val dao = db.userDao()
     @OptIn(ExperimentalPagingApi::class)
     fun getUsers(): Flow<PagingData<UserEntity>> {
         return Pager(
@@ -19,4 +20,6 @@ class UserRepository @Inject constructor(
             pagingSourceFactory = { db.userDao().pagingSource() }
         ).flow
     }
+
+    fun getUserById(userId: String): Flow<UserEntity?> = dao.getUserById(userId)
 }

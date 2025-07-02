@@ -58,7 +58,7 @@ import com.example.shift.ui.theme.ShiftTheme
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.core.net.toUri
 
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.getValue
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shift.ui.theme.ViewModel
@@ -195,17 +195,26 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun UserDetailScreen(userId: String, viewModel: ViewModel, navController: NavController) {
-
-
-    /*    val user = viewModel.users.collectAsState().value.find { it.id == userId } ?: return
+    fun UserDetailScreen(
+        userId: String,
+        viewModel: ViewModel = hiltViewModel(),
+        navController: NavController
+    ) {
+        val user by viewModel.getUserById(userId).collectAsState(initial = null)
         val context = LocalContext.current
 
+        if (user == null) {
+            // Можно показать загрузку или плейсхолдер
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+            return
+        }
 
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text(user.fullName, fontSize = 24.sp, modifier = Modifier.padding(vertical = 8.dp)) },
+                    title = { Text(user!!.fullName, fontSize = 24.sp, modifier = Modifier.padding(vertical = 8.dp)) },
                     navigationIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -213,73 +222,58 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
                     }
                 )
             }
-        ){padding ->
-
+        ) { padding ->
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding),
                 contentAlignment = Alignment.TopCenter
             ) {
-
-
                 Card(
                     modifier = Modifier
                         .fillMaxWidth(0.9f)
                         .wrapContentHeight(),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-                ){
-
+                ) {
                     Column(
                         modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally) {
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         Image(
-                            painter = rememberAsyncImagePainter(user.picture),
+                            painter = rememberAsyncImagePainter(user?.picture),
                             contentDescription = null,
                             modifier = Modifier
                                 .size(128.dp)
                                 .align(Alignment.CenterHorizontally)
                         )
-                        //Text(user.fullName, fontSize = 24.sp, modifier = Modifier.padding(vertical = 8.dp))
-                        Text("Email: ${user.email}", Modifier.clickable {
+                        Text("Email: ${user?.email}", Modifier.clickable {
                             val intent = Intent(Intent.ACTION_SENDTO).apply {
-                                data = "mailto:${user.email}".toUri()
+                                data = "mailto:${user?.email}".toUri()
                             }
                             context.startActivity(intent)
                         })
-                        Text("Телефон: ${user.phone}", Modifier.clickable {
+                        Text("Телефон: ${user?.phone}", Modifier.clickable {
                             val intent = Intent(Intent.ACTION_DIAL).apply {
-                                data = "tel:${user.phone}".toUri()
+                                data = "tel:${user?.phone}".toUri()
                             }
                             context.startActivity(intent)
                         })
                         Text(
-                            "Адрес: ${user.address}",
-
+                            "Адрес: ${user?.address}",
                             Modifier
                                 .fillMaxWidth()
                                 .wrapContentWidth(Alignment.CenterHorizontally)
                                 .clickable {
-                            val intent = Intent(Intent.ACTION_VIEW).apply {
-                                data = "geo:0,0?q=${Uri.encode(user.address)}".toUri()
-                            }
-                            context.startActivity(intent)
-                        }
-
+                                    val intent = Intent(Intent.ACTION_VIEW).apply {
+                                        data = "geo:0,0?q=${Uri.encode(user?.address)}".toUri()
+                                    }
+                                    context.startActivity(intent)
+                                }
                         )
                     }
                 }
-
-
             }
-
-
-
-
-
-        }*/
-
-
+        }
     }
 
 

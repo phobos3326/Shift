@@ -21,30 +21,8 @@ class ViewModel @Inject constructor(
     private val repo: UserRepository
 ) : ViewModel() {
 
-    /*val users = repo.getUsers().stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
-    private val _event = MutableSharedFlow<String>()
-    val event = _event.asSharedFlow()*/
 
-    init {
-        //refresh()
-    }
-
-    /*fun refresh() {
-        viewModelScope.launch {
-            try {
-                repo.refreshUsers()
-            } catch (e: Exception) {
-                _event.emit("Ошибка: ${e.localizedMessage}")
-            }
-        }
-    }*/
-
-
-    /*val users: Flow<PagingData<UserEntity>> = repo.getUsers()
-        .cachedIn(viewModelScope)
-
-    private val _event = MutableSharedFlow<String>()
-    val event = _event.asSharedFlow()*/
 
     val users = repo.getUsers().cachedIn(viewModelScope)
+    fun getUserById(userId: String): Flow<UserEntity?> = repo.getUserById(userId)
 }
