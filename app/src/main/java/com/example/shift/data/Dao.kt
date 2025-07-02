@@ -26,7 +26,8 @@ interface UserDao {
     suspend fun clearAll()
 }
 
-@Database(entities = [UserEntity::class], version = 1)
+@Database(entities = [UserEntity::class, RemoteKeys::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
+    abstract fun remoteKeysDao(): RemoteKeysDao
 }

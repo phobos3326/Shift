@@ -9,18 +9,14 @@ import javax.inject.Inject
 
 class UserRepository @Inject constructor(
     private val api: UserApi,
-    private val dao: UserDao
+    private val db: AppDatabase
 ) {
     @OptIn(ExperimentalPagingApi::class)
     fun getUsers(): Flow<PagingData<UserEntity>> {
         return Pager(
-            config = PagingConfig(
-                pageSize = 10,
-                initialLoadSize = 30,
-                enablePlaceholders = false
-            ),
-            remoteMediator = UserRemoteMediator(api, dao),
-            pagingSourceFactory = { dao.pagingSource() }
+            config = PagingConfig(pageSize = 10, enablePlaceholders = false),
+            remoteMediator = UserRemoteMediator(api, db),
+            pagingSourceFactory = { db.userDao().pagingSource() }
         ).flow
     }
 }
