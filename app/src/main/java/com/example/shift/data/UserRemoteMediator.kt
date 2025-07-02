@@ -9,7 +9,7 @@ import androidx.room.withTransaction
 @OptIn(ExperimentalPagingApi::class)
 class UserRemoteMediator(
     private val api: UserApi,
-    private val db: AppDatabase // передаем всю базу, чтобы иметь доступ и к UserDao и к RemoteKeysDao
+    private val db: AppDatabase
 ) : RemoteMediator<Int, UserEntity>() {
 
     private val userDao = db.userDao()

@@ -4,7 +4,6 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.devtools.ksp)
     id("kotlin-kapt")
-    //id("androidx.room")
     alias(libs.plugins.hilt)
     alias(libs.plugins.androidx.navigation.safeargs)
 
@@ -66,26 +65,22 @@ dependencies {
 
     implementation(libs.retrofit)
 
+    // moshi
     implementation (libs.moshi.kotlin)
     implementation (libs.converter.moshi)
     ksp (libs.moshi.kotlin.codegen)
 
 
-
+    // logging-interceptor
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
+    // hilt
     implementation(libs.hilt.android)
     implementation ("androidx.hilt:hilt-navigation-compose:1.0.0")
-
-
-
+    implementation ("androidx.hilt:hilt-navigation-compose:1.0.0")
     ksp(libs.hilt.compiler)
 
-
-
-
-
-
+    // ROOM
     implementation(libs.androidx.room.runtime)
     annotationProcessor(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
@@ -97,56 +92,22 @@ dependencies {
     // Optional: Room testing support
     testImplementation("androidx.room:room-testing:${libs.versions.room.get()}")
 
-
+    // coil
     implementation(libs.coil)
     implementation("io.coil-kt:coil-compose:2.5.0")
 
-
-    implementation ("androidx.hilt:hilt-navigation-compose:1.0.0")
 
     // navigation
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
 
 
-
+    // paging
     implementation("androidx.paging:paging-runtime:3.1.0")
-
     implementation("androidx.paging:paging-compose:3.3.6")
 
 
 
-   // implementation (libs.androidx.room)
-    //kapt (libs.androidx.room.compiler)
-   // ksp("androidx.room:room-compiler:2.6.1")
-/*    val room_version = "2.7.2"
 
-    implementation("androidx.room:room-runtime:$room_version")
-
-    // If this project uses any Kotlin source, use Kotlin Symbol Processing (KSP)
-    // See Add the KSP plugin to your project
-    ksp("androidx.room:room-compiler:$room_version")
-
-    // If this project only uses Java source, use the Java annotationProcessor
-    // No additional plugins are necessary
-    annotationProcessor("androidx.room:room-compiler:$room_version")
-
-    // optional - Kotlin Extensions and Coroutines support for Room
-    implementation("androidx.room:room-ktx:$room_version")
-
-    // optional - RxJava2 support for Room
-    implementation("androidx.room:room-rxjava2:$room_version")
-
-    // optional - RxJava3 support for Room
-    implementation("androidx.room:room-rxjava3:$room_version")
-
-    // optional - Guava support for Room, including Optional and ListenableFuture
-    implementation("androidx.room:room-guava:$room_version")
-
-    // optional - Test helpers
-    testImplementation("androidx.room:room-testing:$room_version")
-
-    // optional - Paging 3 Integration
-    implementation("androidx.room:room-paging:$room_version")*/
 
 }

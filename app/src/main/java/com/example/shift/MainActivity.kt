@@ -62,7 +62,7 @@ import androidx.compose.runtime.getValue
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shift.ui.theme.ViewModel
-import org.intellij.lang.annotations.JdkConstants
+
 
 
 @AndroidEntryPoint
@@ -86,13 +86,7 @@ class MainActivity : ComponentActivity() {
     }
 
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+
 
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -102,10 +96,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
         val context = LocalContext.current
         val snackHost = remember { SnackbarHostState() }
 
-        LaunchedEffect(Unit) {
-            // Обработка событий (например ошибок) можно адаптировать к Paging LoadState
-            // Или использовать viewModel.event, если реализовано
-        }
+
 
         Scaffold(
             snackbarHost = { SnackbarHost(snackHost) },
@@ -120,7 +111,6 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
                 )
             },
             floatingActionButton = {
-                // Можно убрать, если обновление будет через SwipeRefresh
                 FloatingActionButton(onClick = { lazyPagingItems.refresh() }) {
                     Icon(Icons.Default.Refresh, contentDescription = null)
                 }
@@ -155,12 +145,11 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
                     }
                 }
 
-                // Можно добавить UI для индикаторов загрузки / ошибок
                 lazyPagingItems.apply {
                     when (loadState.append) {
                         is LoadState.Loading -> {
                             item {
-                                CircularProgressIndicator(modifier = Modifier.fillMaxWidth().padding(16.dp))
+                                CircularProgressIndicator(modifier = Modifier.padding(16.dp))
                             }
                         }
                         is LoadState.Error -> {
@@ -282,7 +271,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Composable
 fun GreetingPreview() {
     ShiftTheme {
-        Greeting("Android")
+
     }
 }
 }

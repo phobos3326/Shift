@@ -3,11 +3,6 @@ package com.example.shift.data
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
-/*@JsonClass(generateAdapter = true)
-data class UserResponse(
-    @Json(name = "results") val results: List<UserDto>
-)*/
-
 @JsonClass(generateAdapter = true)
 data class UserDto(
     @Json(name = "login") val login: LoginDto,
