@@ -20,6 +20,10 @@ class ViewModel @Inject constructor(
     private val _event = MutableSharedFlow<String>()
     val event = _event.asSharedFlow()
 
+    init {
+        refresh()
+    }
+
     fun refresh() {
         viewModelScope.launch {
             try {
