@@ -90,7 +90,9 @@ dependencies {
     annotationProcessor(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
-
+    ksp ("androidx.room:room-compiler:2.5.0")
+    implementation("androidx.room:room-paging:2.5.0")
+    implementation("androidx.paging:paging-runtime:3.1.1")
 
     // Optional: Room testing support
     testImplementation("androidx.room:room-testing:${libs.versions.room.get()}")
@@ -105,6 +107,12 @@ dependencies {
     // navigation
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+
+
+
+    implementation("androidx.paging:paging-runtime:3.1.0")
+
+    implementation("androidx.paging:paging-compose:3.3.6")
 
 
 

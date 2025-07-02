@@ -3,23 +3,22 @@ package com.example.shift.data
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
-@JsonClass(generateAdapter = true)
+/*@JsonClass(generateAdapter = true)
 data class UserResponse(
-    @param:Json(name = "results") val results: List<UserDto>
-)
+    @Json(name = "results") val results: List<UserDto>
+)*/
 
 @JsonClass(generateAdapter = true)
 data class UserDto(
-    @param:Json(name = "login") val login: LoginDto,
-    @param:Json(name = "name") val name: NameDto,
-    @param:Json(name = "email") val email: String,
-    @param:Json(name = "phone") val phone: String,
-    @param:Json(name = "location") val location: LocationDto,
-    @param:Json(name = "picture" ) val picture: PictureDto,
+    @Json(name = "login") val login: LoginDto,
+    @Json(name = "name") val name: NameDto,
+    @Json(name = "email") val email: String,
+    @Json(name = "phone") val phone: String,
+    @Json(name = "location") val location: LocationDto,
+    @Json(name = "picture") val picture: PictureDto
+)
 
 
-
-    )
 @JsonClass(generateAdapter = true)
 data class LoginDto(@Json(name = "uuid") val uuid: String)
 @JsonClass(generateAdapter = true)

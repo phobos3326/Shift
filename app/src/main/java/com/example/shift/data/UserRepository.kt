@@ -1,5 +1,9 @@
 package com.example.shift.data
 
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -7,22 +11,16 @@ class UserRepository @Inject constructor(
     private val api: UserApi,
     private val dao: UserDao
 ) {
-    fun getUsers(): Flow<List<UserEntity>> = dao.getUsers()
-
-    suspend fun refreshUsers() {
-        val response = api.getUsers()
-        val mapped = response.results.map {
-            UserEntity(
-                id = it.login.uuid,
-                fullName = "${it.name.first} ${it.name.last}",
-                email = it.email,
-                phone = it.phone,
-                address = "${it.location.street.number} ${it.location.street.name}, ${it.location.city}",
-                thumbnail = it.picture.thumbnail,
-                picture = it.picture.large
-            )
-        }
-        dao.clearAll()
-        dao.insertAll(mapped)
+    @OptIn(ExperimentalPagingApi::class)
+    fun getUsers(): Flow<PagingData<UserEntity>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 10,
+                initialLoadSize = 30,
+                enablePlaceholders = false
+            ),
+            remoteMediator = UserRemoteMediator(api, dao),
+            pagingSourceFactory = { dao.pagingSource() }
+        ).flow
     }
 }

@@ -1,5 +1,6 @@
 package com.example.shift.data
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Database
 import androidx.room.Insert
@@ -10,9 +11,14 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserDao {
-    @Query("SELECT * FROM users")
-    fun getUsers(): Flow<List<UserEntity>>
 
+    @Query("SELECT * FROM users")
+    fun pagingSource(): PagingSource<Int, UserEntity>
+
+
+   /* @Query("SELECT * FROM users")
+    fun getUsers(): Flow<List<UserEntity>>
+*/
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(users: List<UserEntity>)
 

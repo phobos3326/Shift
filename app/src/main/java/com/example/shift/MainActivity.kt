@@ -17,18 +17,20 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -37,7 +39,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,6 +59,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import androidx.core.net.toUri
 
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shift.ui.theme.ViewModel
 import org.intellij.lang.annotations.JdkConstants
 
@@ -91,59 +95,90 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun UserListScreen(navController: NavController, viewModel: ViewModel = hiltViewModel()) {
-    val users by viewModel.users.collectAsState()
-    val context = LocalContext.current
-    val snackHost = remember { SnackbarHostState() }
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun UserListScreen(navController: NavController, viewModel: ViewModel = hiltViewModel()) {
+        val lazyPagingItems = viewModel.users.collectAsLazyPagingItems()
+        val context = LocalContext.current
+        val snackHost = remember { SnackbarHostState() }
 
-    LaunchedEffect(Unit) {
-        viewModel.event.collect {
-            snackHost.showSnackbar(it)
+        LaunchedEffect(Unit) {
+            // Обработка событий (например ошибок) можно адаптировать к Paging LoadState
+            // Или использовать viewModel.event, если реализовано
         }
-    }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackHost) },
-        topBar = { TopAppBar(title = { Text("Пользователи") },
-            navigationIcon = {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                }
-            }
-
-            ) },
-
-        floatingActionButton = {
-            FloatingActionButton(onClick = { viewModel.refresh() }) {
-                Icon(Icons.Default.Refresh, contentDescription = null)
-            }
-        }
-    ) {
-        LazyColumn(modifier = Modifier.padding(it)) {
-            items(users) { user ->
-                ListItem(
-                    headlineContent = { Text(user.fullName) },
-                    supportingContent = { Text(user.address) },
-                   /* headlineContent = { Text("user.fullName") },
-                    supportingContent = { Text("user.address") },*/
-                    leadingContent = {
-                        Image(
-                            painter = rememberAsyncImagePainter(user.thumbnail),
-                            contentDescription = null,
-                            modifier = Modifier.size(48.dp)
-                        )
-                    },
-                    modifier = Modifier.clickable {
-                        navController.navigate("detail/${user.id}")
+        Scaffold(
+            snackbarHost = { SnackbarHost(snackHost) },
+            topBar = {
+                TopAppBar(
+                    title = { Text("Пользователи") },
+                    navigationIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        }
                     }
                 )
-                Divider()
+            },
+            floatingActionButton = {
+                // Можно убрать, если обновление будет через SwipeRefresh
+                FloatingActionButton(onClick = { lazyPagingItems.refresh() }) {
+                    Icon(Icons.Default.Refresh, contentDescription = null)
+                }
+            }
+        ) { paddingValues ->
+
+            LazyColumn(modifier = Modifier.padding(paddingValues)) {
+                items(lazyPagingItems.itemCount) { index ->
+
+                    val user = lazyPagingItems[index]
+
+                    if (user != null) {
+                        ListItem(
+                            /*headlineContent = { Text("user.fullName") },
+                            supportingContent = { Text("user.address") },*/
+
+                            headlineContent = { Text(user.fullName) },
+                            supportingContent = { Text(user.address) },
+
+                            leadingContent = {
+                                Image(
+                                    painter = rememberAsyncImagePainter(user.thumbnail),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(48.dp)
+                                )
+                            },
+                            modifier = Modifier.clickable {
+                                navController.navigate("detail/${user.id}")
+                            }
+                        )
+                        Divider()
+                    }
+                }
+
+                // Можно добавить UI для индикаторов загрузки / ошибок
+                lazyPagingItems.apply {
+                    when (loadState.append) {
+                        is LoadState.Loading -> {
+                            item {
+                                CircularProgressIndicator(modifier = Modifier.fillMaxWidth().padding(16.dp))
+                            }
+                        }
+                        is LoadState.Error -> {
+                            val e = loadState.append as LoadState.Error
+                            item {
+                                Text(
+                                    "Ошибка загрузки: ${e.error.localizedMessage}",
+                                    color = MaterialTheme.colorScheme.error,
+                                    modifier = Modifier.padding(16.dp)
+                                )
+                            }
+                        }
+                        else -> {}
+                    }
+                }
             }
         }
     }
-}
 
     @Composable
     fun AppNav(modifier: Modifier = Modifier) {
@@ -163,7 +198,7 @@ fun UserListScreen(navController: NavController, viewModel: ViewModel = hiltView
     fun UserDetailScreen(userId: String, viewModel: ViewModel, navController: NavController) {
 
 
-        val user = viewModel.users.collectAsState().value.find { it.id == userId } ?: return
+    /*    val user = viewModel.users.collectAsState().value.find { it.id == userId } ?: return
         val context = LocalContext.current
 
 
@@ -242,7 +277,7 @@ fun UserListScreen(navController: NavController, viewModel: ViewModel = hiltView
 
 
 
-        }
+        }*/
 
 
     }
