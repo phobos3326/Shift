@@ -8,15 +8,21 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -46,9 +52,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.shift.ui.theme.ShiftTheme
-import com.example.shift.ui.theme.UserViewModel
+
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.core.net.toUri
+
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.shift.ui.theme.ViewModel
+import org.intellij.lang.annotations.JdkConstants
 
 
 @AndroidEntryPoint
@@ -59,10 +69,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             ShiftTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    /*Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )*/
+
 
                     AppNav(
                         modifier = Modifier.padding(innerPadding)
@@ -86,7 +93,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserListScreen(navController: NavController, viewModel: UserViewModel = hiltViewModel()) {
+fun UserListScreen(navController: NavController, viewModel: ViewModel = hiltViewModel()) {
     val users by viewModel.users.collectAsState()
     val context = LocalContext.current
     val snackHost = remember { SnackbarHostState() }
@@ -141,49 +148,103 @@ fun UserListScreen(navController: NavController, viewModel: UserViewModel = hilt
     @Composable
     fun AppNav(modifier: Modifier = Modifier) {
         val navController = rememberNavController()
-
+        val viewModel: ViewModel = hiltViewModel()
         NavHost(navController, startDestination = "list") {
             composable("list") { UserListScreen(navController) }
             composable("detail/{userId}") { backStackEntry ->
                 val id = backStackEntry.arguments?.getString("userId") ?: return@composable
-                UserDetailScreen(id)
+                UserDetailScreen(id, viewModel, navController )
             }
         }
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun UserDetailScreen(userId: String, viewModel: UserViewModel = hiltViewModel()) {
+    fun UserDetailScreen(userId: String, viewModel: ViewModel, navController: NavController) {
+
+
         val user = viewModel.users.collectAsState().value.find { it.id == userId } ?: return
         val context = LocalContext.current
 
-        Column(modifier = Modifier.padding(16.dp)) {
-            Image(
-                painter = rememberAsyncImagePainter(user.picture),
-                contentDescription = null,
+
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(user.fullName, fontSize = 24.sp, modifier = Modifier.padding(vertical = 8.dp)) },
+                    navigationIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        }
+                    }
+                )
+            }
+        ){padding ->
+
+            Box(
                 modifier = Modifier
-                    .size(128.dp)
-                    .align(Alignment.CenterHorizontally)
-            )
-            Text(user.fullName, fontSize = 24.sp, modifier = Modifier.padding(vertical = 8.dp))
-            Text("Email: ${user.email}", Modifier.clickable {
-                val intent = Intent(Intent.ACTION_SENDTO).apply {
-                    data = "mailto:${user.email}".toUri()
+                    .fillMaxSize()
+                    .padding(padding),
+                contentAlignment = Alignment.TopCenter
+            ) {
+
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth(0.9f)
+                        .wrapContentHeight(),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                ){
+
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally) {
+                        Image(
+                            painter = rememberAsyncImagePainter(user.picture),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(128.dp)
+                                .align(Alignment.CenterHorizontally)
+                        )
+                        //Text(user.fullName, fontSize = 24.sp, modifier = Modifier.padding(vertical = 8.dp))
+                        Text("Email: ${user.email}", Modifier.clickable {
+                            val intent = Intent(Intent.ACTION_SENDTO).apply {
+                                data = "mailto:${user.email}".toUri()
+                            }
+                            context.startActivity(intent)
+                        })
+                        Text("Телефон: ${user.phone}", Modifier.clickable {
+                            val intent = Intent(Intent.ACTION_DIAL).apply {
+                                data = "tel:${user.phone}".toUri()
+                            }
+                            context.startActivity(intent)
+                        })
+                        Text(
+                            "Адрес: ${user.address}",
+
+                            Modifier
+                                .fillMaxWidth()
+                                .wrapContentWidth(Alignment.CenterHorizontally)
+                                .clickable {
+                            val intent = Intent(Intent.ACTION_VIEW).apply {
+                                data = "geo:0,0?q=${Uri.encode(user.address)}".toUri()
+                            }
+                            context.startActivity(intent)
+                        }
+
+                        )
+                    }
                 }
-                context.startActivity(intent)
-            })
-            Text("Телефон: ${user.phone}", Modifier.clickable {
-                val intent = Intent(Intent.ACTION_DIAL).apply {
-                    data = "tel:${user.phone}".toUri()
-                }
-                context.startActivity(intent)
-            })
-            Text("Адрес: ${user.address}", Modifier.clickable {
-                val intent = Intent(Intent.ACTION_VIEW).apply {
-                    data = "geo:0,0?q=${Uri.encode(user.address)}".toUri()
-                }
-                context.startActivity(intent)
-            })
+
+
+            }
+
+
+
+
+
         }
+
+
     }
 
 
