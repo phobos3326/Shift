@@ -15,11 +15,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -46,6 +48,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.shift.ui.theme.ShiftTheme
 import com.example.shift.ui.theme.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.core.net.toUri
 
 
 @AndroidEntryPoint
@@ -96,7 +99,15 @@ fun UserListScreen(navController: NavController, viewModel: UserViewModel = hilt
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackHost) },
-        topBar = { TopAppBar(title = { Text("Пользователи") }) },
+        topBar = { TopAppBar(title = { Text("Пользователи") },
+            navigationIcon = {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                }
+            }
+
+            ) },
+
         floatingActionButton = {
             FloatingActionButton(onClick = { viewModel.refresh() }) {
                 Icon(Icons.Default.Refresh, contentDescription = null)
@@ -156,19 +167,19 @@ fun UserListScreen(navController: NavController, viewModel: UserViewModel = hilt
             Text(user.fullName, fontSize = 24.sp, modifier = Modifier.padding(vertical = 8.dp))
             Text("Email: ${user.email}", Modifier.clickable {
                 val intent = Intent(Intent.ACTION_SENDTO).apply {
-                    data = Uri.parse("mailto:${user.email}")
+                    data = "mailto:${user.email}".toUri()
                 }
                 context.startActivity(intent)
             })
             Text("Телефон: ${user.phone}", Modifier.clickable {
                 val intent = Intent(Intent.ACTION_DIAL).apply {
-                    data = Uri.parse("tel:${user.phone}")
+                    data = "tel:${user.phone}".toUri()
                 }
                 context.startActivity(intent)
             })
             Text("Адрес: ${user.address}", Modifier.clickable {
                 val intent = Intent(Intent.ACTION_VIEW).apply {
-                    data = Uri.parse("geo:0,0?q=${Uri.encode(user.address)}")
+                    data = "geo:0,0?q=${Uri.encode(user.address)}".toUri()
                 }
                 context.startActivity(intent)
             })
