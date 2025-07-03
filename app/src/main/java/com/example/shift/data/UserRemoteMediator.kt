@@ -38,10 +38,26 @@ class UserRemoteMediator(
             val users = apiResponse.results.map {
                 UserEntity(
                     id = it.login.uuid,
+                    gender = it.gender,
                     fullName = "${it.name.first} ${it.name.last}",
                     email = it.email,
                     phone = it.phone,
-                    address = "${it.location.street.number} ${it.location.street.name}, ${it.location.city}",
+                    cell = it.cell,
+                    address = "${it.location.street.number} ${it.location.street.name}, ${it.location.city}, ${it.location.state}, ${it.location.country}",
+                    postcode = it.location.postcode.toString(),
+                    state = it.location.state,
+                    country = it.location.country,
+                    latitude = it.location.coordinates.latitude,
+                    longitude = it.location.coordinates.longitude,
+                    timezoneOffset = it.location.timezone.offset,
+                    timezoneDescription = it.location.timezone.description,
+                    dobDate = it.dob.date,
+                    dobAge = it.dob.age,
+                    registeredDate = it.registered.date,
+                    registeredAge = it.registered.age,
+                    idName = it.id.name,
+                    idValue = it.id.value,
+                    nat = it.nat,
                     thumbnail = it.picture.thumbnail,
                     picture = it.picture.large
                 )

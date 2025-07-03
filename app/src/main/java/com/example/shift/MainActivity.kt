@@ -10,8 +10,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -193,7 +195,6 @@ class MainActivity : ComponentActivity() {
         val context = LocalContext.current
 
         if (user == null) {
-            // Можно показать загрузку или плейсхолдер
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
@@ -229,36 +230,66 @@ class MainActivity : ComponentActivity() {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Image(
-                            painter = rememberAsyncImagePainter(user?.picture),
+                            painter = rememberAsyncImagePainter(user!!.picture),
                             contentDescription = null,
                             modifier = Modifier
                                 .size(128.dp)
                                 .align(Alignment.CenterHorizontally)
                         )
-                        Text("Email: ${user?.email}", Modifier.clickable {
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Text("Пол: ${user!!.gender}")
+                        Text("Email: ${user!!.email}", Modifier.clickable {
                             val intent = Intent(Intent.ACTION_SENDTO).apply {
-                                data = "mailto:${user?.email}".toUri()
+                                data = "mailto:${user!!.email}".toUri()
                             }
                             context.startActivity(intent)
                         })
-                        Text("Телефон: ${user?.phone}", Modifier.clickable {
+                        Text("Телефон: ${user!!.phone}", Modifier.clickable {
                             val intent = Intent(Intent.ACTION_DIAL).apply {
-                                data = "tel:${user?.phone}".toUri()
+                                data = "tel:${user!!.phone}".toUri()
                             }
                             context.startActivity(intent)
                         })
+                        Text("Мобильный: ${user!!.cell}", Modifier.clickable {
+                            val intent = Intent(Intent.ACTION_DIAL).apply {
+                                data = "tel:${user!!.cell}".toUri()
+                            }
+                            context.startActivity(intent)
+                        })
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
                         Text(
-                            "Адрес: ${user?.address}",
+                            "Адрес: ${user!!.address}, ${user!!.postcode}",
                             Modifier
                                 .fillMaxWidth()
                                 .wrapContentWidth(Alignment.CenterHorizontally)
                                 .clickable {
                                     val intent = Intent(Intent.ACTION_VIEW).apply {
-                                        data = "geo:0,0?q=${Uri.encode(user?.address)}".toUri()
+                                        data = "geo:0,0?q=${Uri.encode(user!!.address)}".toUri()
                                     }
                                     context.startActivity(intent)
                                 }
                         )
+                        Text("Штат: ${user!!.state}")
+                        Text("Страна: ${user!!.country}")
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Text("Координаты: ${user!!.latitude}, ${user!!.longitude}")
+                        Text("Часовой пояс: ${user!!.timezoneOffset} (${user!!.timezoneDescription})")
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Text("Дата рождения: ${user!!.dobDate} (Возраст: ${user!!.dobAge})")
+                        Text("Дата регистрации: ${user!!.registeredDate} (Возраст регистрации: ${user!!.registeredAge})")
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Text("ID: ${user!!.idName ?: "-"} - ${user!!.idValue ?: "-"}")
+                        Text("Национальность: ${user!!.nat}")
                     }
                 }
             }
