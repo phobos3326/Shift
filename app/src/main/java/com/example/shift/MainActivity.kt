@@ -66,6 +66,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import androidx.core.net.toUri
 
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
@@ -135,8 +136,6 @@ class MainActivity : ComponentActivity() {
 
                     if (user != null) {
                         ListItem(
-                            /*headlineContent = { Text("user.fullName") },
-                            supportingContent = { Text("user.address") },*/
 
                             headlineContent = { Text(user.fullName) },
                             supportingContent = { Text(user.address) },
@@ -145,7 +144,9 @@ class MainActivity : ComponentActivity() {
                                 Image(
                                     painter = rememberAsyncImagePainter(user.thumbnail),
                                     contentDescription = null,
-                                    modifier = Modifier.size(48.dp)
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .clip(CircleShape)
                                 )
                             },
                             modifier = Modifier.clickable {
