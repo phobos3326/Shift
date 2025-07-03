@@ -61,7 +61,7 @@ import androidx.core.net.toUri
 import androidx.compose.runtime.getValue
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.example.shift.ui.theme.ViewModel
+import com.example.shift.ui.ViewModel
 
 
 
