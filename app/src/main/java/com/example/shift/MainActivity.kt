@@ -10,18 +10,24 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -39,7 +45,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 
 import androidx.compose.runtime.remember
@@ -61,6 +66,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import androidx.core.net.toUri
 
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shift.ui.ViewModel
@@ -104,7 +113,7 @@ class MainActivity : ComponentActivity() {
             snackbarHost = { SnackbarHost(snackHost) },
             topBar = {
                 TopAppBar(
-                    title = { Text("Пользователи") },
+                    title = { Text(stringResource(R.string.users)) },
                     navigationIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -204,7 +213,7 @@ class MainActivity : ComponentActivity() {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text(user!!.fullName, fontSize = 24.sp, modifier = Modifier.padding(vertical = 8.dp)) },
+                    title = { Text(stringResource(R.string.user_info), fontSize = 24.sp) },
                     navigationIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -213,86 +222,160 @@ class MainActivity : ComponentActivity() {
                 )
             }
         ) { padding ->
-            Box(
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(padding),
-                contentAlignment = Alignment.TopCenter
+                    .padding(padding)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Card(
+                    modifier = Modifier.size(140.dp),
+                    shape = CircleShape,
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                ) {
+                    Image(
+                        painter = rememberAsyncImagePainter(user!!.picture),
+                        contentDescription = stringResource(R.string.user_photo),
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = user!!.fullName,
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+
                 Card(
                     modifier = Modifier
-                        .fillMaxWidth(0.9f)
-                        .wrapContentHeight(),
+                        .fillMaxWidth(0.9f),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                 ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Image(
-                            painter = rememberAsyncImagePainter(user!!.picture),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(128.dp)
-                                .align(Alignment.CenterHorizontally)
-                        )
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(stringResource(R.string.contact_info), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
 
                         Spacer(modifier = Modifier.height(12.dp))
 
-                        Text("Пол: ${user!!.gender}")
-                        Text("Email: ${user!!.email}", Modifier.clickable {
+                        InfoRow(icon = Icons.Default.Email, label = "Email", value = user!!.email) {
                             val intent = Intent(Intent.ACTION_SENDTO).apply {
                                 data = "mailto:${user!!.email}".toUri()
                             }
                             context.startActivity(intent)
-                        })
-                        Text("Телефон: ${user!!.phone}", Modifier.clickable {
+                        }
+
+                        InfoRow(icon = Icons.Default.Phone, label = stringResource(R.string.phone), value = user!!.phone) {
                             val intent = Intent(Intent.ACTION_DIAL).apply {
-                                data = "tel:${user!!.phone}".toUri()
+                                data = getString(R.string.tel, user!!.phone).toUri()
                             }
                             context.startActivity(intent)
-                        })
-                        Text("Мобильный: ${user!!.cell}", Modifier.clickable {
+                        }
+
+                        InfoRow(
+                            icon = Icons.Default.Phone,
+                            label = stringResource(R.string.mobile), value = user!!.cell) {
                             val intent = Intent(Intent.ACTION_DIAL).apply {
-                                data = "tel:${user!!.cell}".toUri()
+                                data = getString(R.string.tel, user!!.cell).toUri()
                             }
                             context.startActivity(intent)
-                        })
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        Text(
-                            "Адрес: ${user!!.address}, ${user!!.postcode}",
-                            Modifier
-                                .fillMaxWidth()
-                                .wrapContentWidth(Alignment.CenterHorizontally)
-                                .clickable {
-                                    val intent = Intent(Intent.ACTION_VIEW).apply {
-                                        data = "geo:0,0?q=${Uri.encode(user!!.address)}".toUri()
-                                    }
-                                    context.startActivity(intent)
-                                }
-                        )
-                        Text("Штат: ${user!!.state}")
-                        Text("Страна: ${user!!.country}")
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        Text("Координаты: ${user!!.latitude}, ${user!!.longitude}")
-                        Text("Часовой пояс: ${user!!.timezoneOffset} (${user!!.timezoneDescription})")
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        Text("Дата рождения: ${user!!.dobDate} (Возраст: ${user!!.dobAge})")
-                        Text("Дата регистрации: ${user!!.registeredDate} (Возраст регистрации: ${user!!.registeredAge})")
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        Text("ID: ${user!!.idName ?: "-"} - ${user!!.idValue ?: "-"}")
-                        Text("Национальность: ${user!!.nat}")
+                        }
                     }
                 }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Address Card
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth(0.9f),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(stringResource(R.string.address), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable {
+                            val intent = Intent(Intent.ACTION_VIEW).apply {
+                                data = "geo:0,0?q=${Uri.encode(user!!.address)}".toUri()
+                            }
+                            context.startActivity(intent)
+                        }) {
+                            Icon(Icons.Default.LocationOn, contentDescription = "Location", tint = MaterialTheme.colorScheme.primary)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "${user!!.address}, ${user!!.postcode}," +
+                                       "${user!!.state}, ${user!!.country}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Additional info card
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth(0.9f),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(stringResource(R.string.more_info), style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold)
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        InfoRow(label = stringResource(R.string.gender), value = user!!.gender)
+                        InfoRow(label = stringResource(R.string.age), value = user!!.dobAge.toString())
+                        InfoRow(label = stringResource(R.string.date_of_birth), value = user!!.dobDate)
+                        InfoRow(label = stringResource(R.string.date_of_registration), value = user!!.registeredDate)
+                        InfoRow(label = stringResource(R.string.time_zone), value = "${user!!.timezoneOffset} (${user!!.timezoneDescription})")
+                        InfoRow(label = stringResource(R.string.id), value = "${user!!.idName ?: "-"} - ${user!!.idValue ?: "-"}")
+                        InfoRow(label = stringResource(R.string.nationality), value = user!!.nat)
+                        InfoRow(label = stringResource(R.string.coordinates), value = "${user!!.latitude}, ${user!!.longitude}")
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(30.dp))
             }
+        }
+    }
+
+
+
+
+    @Composable
+    fun InfoRow(
+        icon: ImageVector? = null,
+        label: String,
+        value: String,
+        onClick: (() -> Unit)? = null
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .let {
+                    if (onClick != null) it.clickable { onClick() } else it
+                }
+                .padding(vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (icon != null) {
+                Icon(icon, contentDescription = label, tint = MaterialTheme.colorScheme.primary)
+                Spacer(modifier = Modifier.width(12.dp))
+            }
+            Text(text = "$label:", fontWeight = FontWeight.Medium, modifier = Modifier.width(110.dp))
+            Text(text = value, style = MaterialTheme.typography.bodyMedium)
         }
     }
 
