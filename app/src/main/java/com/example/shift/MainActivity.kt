@@ -275,7 +275,7 @@ class MainActivity : ComponentActivity() {
 
                         InfoRow(icon = Icons.Default.Phone, label = stringResource(R.string.phone), value = user!!.phone) {
                             val intent = Intent(Intent.ACTION_DIAL).apply {
-                                data = getString(R.string.tel, user!!.phone).toUri()
+                                data = getString(R.string.tel, user?.phone).toUri()
                             }
                             context.startActivity(intent)
                         }
@@ -284,7 +284,7 @@ class MainActivity : ComponentActivity() {
                             icon = Icons.Default.Phone,
                             label = stringResource(R.string.mobile), value = user!!.cell) {
                             val intent = Intent(Intent.ACTION_DIAL).apply {
-                                data = getString(R.string.tel, user!!.cell).toUri()
+                                data = getString(R.string.tel, user?.cell).toUri()
                             }
                             context.startActivity(intent)
                         }
